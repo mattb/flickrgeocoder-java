@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.*;
 import com.vividsolutions.jts.index.*;
 import com.vividsolutions.jts.index.strtree.*;
@@ -9,6 +10,7 @@ import org.geotools.feature.simple.*;
 import org.geotools.data.*;
 import org.geotools.data.shapefile.*;
 import org.opengis.feature.simple.*;
+import org.opengis.feature.*;
 import org.geotools.geometry.jts.JTS;
 
 import java.io.IOException;
@@ -29,11 +31,34 @@ public class HelloWorld extends HttpServlet {
       tree.insert(JTS.toGeometry(f.getBounds()).getEnvelopeInternal(),f);
     }
   }
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-    throws ServletException, IOException {
-    resp.getWriter().print(tree.size() + " shapes loaded.");
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    double lat = Double.parseDouble(req.getParameter("lat"));
+    double lng = Double.parseDouble(req.getParameter("lng"));
+    GeometryFactory gf = new GeometryFactory();
+    Coordinate c = new Coordinate(lng, lat);
+    Point p = gf.createPoint(c);
+    List<Map> results = new ArrayList<Map>(5);
+    for(Object f : tree.query(new Envelope(c))) {
+      SimpleFeature feature = (SimpleFeature)f;
+      MultiPolygon g = (MultiPolygon)feature.getDefaultGeometry();
+      try {
+        if(g.contains(p)) {
+          Map<String, Object> result = new HashMap();
+          for(Property prop : feature.getProperties()) {
+            if(!prop.getName().toString().equals("the_geom")) {
+              result.put(prop.getName().toString(), prop.getValue());
+            }
+          }
+          results.add(result);
+        }
+      } catch(TopologyException e) {
+        //resp.getWriter().print(e);
+      }
     }
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.writerWithDefaultPrettyPrinter().writeValue(resp.getWriter(), results);
+  }
 
   public static void main(String[] args) throws Exception{
     Server server = new Server(Integer.valueOf(System.getenv("PORT")));
