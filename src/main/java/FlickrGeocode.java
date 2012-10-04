@@ -19,9 +19,9 @@ import javax.servlet.http.*;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.*;
 
-public class HelloWorld extends HttpServlet {
+public class FlickrGeocode extends HttpServlet {
   public STRtree tree = new STRtree();
-  public HelloWorld() throws IOException {
+  public FlickrGeocode() throws IOException {
     org.geotools.util.logging.Logging.GEOTOOLS.setLoggerFactory(org.geotools.util.logging.Log4JLoggerFactory.getInstance());
     org.apache.log4j.LogManager.getLogger("org.geotools").setLevel(org.apache.log4j.Level.OFF);
     ShapefileDataStore data = new ShapefileDataStore(getClass().getResource("flickr_shapes_public_dataset_2.0/flickr_shapes_localities/OGRGeoJSON.shp"));
@@ -65,7 +65,7 @@ public class HelloWorld extends HttpServlet {
     ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
     context.setContextPath("/");
     server.setHandler(context);
-    context.addServlet(new ServletHolder(new HelloWorld()),"/*");
+    context.addServlet(new ServletHolder(new FlickrGeocode()),"/*");
     server.start();
     server.join();   
   }

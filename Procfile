@@ -1,1 +1,1 @@
-web:    java -Xmx512m -cp target/classes:target/dependency/* HelloWorld
+web:    java -Xmx512m -cp target/classes:target/dependency/* FlickrGeocode
