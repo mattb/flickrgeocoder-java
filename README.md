@@ -3,6 +3,8 @@ Flickr Shapefiles Geocoder
 
 A Java geocoder that uses [Geotools](http://www.geotools.org/) and [JTS](http://tsusiatsoftware.net/jts/main.html) to index [Flickr Shapefiles](http://code.flickr.com/blog/2011/01/08/flickr-shapefiles-public-dataset-2-0/) to map (latitude, longitude) to [WOEID](http://en.wikipedia.org/wiki/WOEID).
 
+The code has no external server dependencies and runs in memory. You may have to specify a larger max heap size if you use the largest files (e.g. the localities dataset uses around 450Mb on my Mac).
+
 ESRI Shapefiles for the Flickr dataset are included in the repository. They were converted from Flickr GeoJSON using [ogr2ogr](http://www.gdal.org/ogr2ogr.html). The original files were released under a [Creative Commons Zero Waiver](http://creativecommons.org/publicdomain/zero/1.0/), and so are these data files.
 
 A Procfile and basic servlet (hardcoded to use the countries dataset) are included so that the geocoder can be run on Heroku.
