@@ -7,6 +7,11 @@
   <version>1.0-SNAPSHOT</version>
   <artifactId>flickrgeocode</artifactId>
   <dependencies>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>13.0.1</version>
+    </dependency>
     <dependency><groupId>org.geotools</groupId><artifactId>gt-main</artifactId><version>8.2</version></dependency>
     <dependency><groupId>org.geotools</groupId><artifactId>gt-shapefile</artifactId><version>8.2</version></dependency>
     <dependency><groupId>com.vividsolutions</groupId><artifactId>jts</artifactId><version>1.12</version></dependency>
