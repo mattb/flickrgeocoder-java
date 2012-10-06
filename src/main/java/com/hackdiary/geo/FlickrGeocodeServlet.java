@@ -13,7 +13,7 @@ import org.eclipse.jetty.servlet.*;
 public class FlickrGeocodeServlet extends HttpServlet {
   FlickrGeocode geocode;
   public FlickrGeocodeServlet() throws IOException {
-    geocode = new FlickrGeocode(getClass().getResource("flickr_shapes_public_dataset_2.0/flickr_shapes_localities/OGRGeoJSON.shp"));
+    geocode = new FlickrGeocode(getClass().getResource("flickr_shapes_public_dataset_2.0/flickr_shapes_countries/OGRGeoJSON.shp"));
   }
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

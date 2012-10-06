@@ -1,1 +1,1 @@
-web:    java -Xmx448m -cp target/classes:target/dependency/* com.hackdiary.geo.FlickrGeocodeServlet
+web:    java -Xmx384m -cp target/classes:target/dependency/* com.hackdiary.geo.FlickrGeocodeServlet
