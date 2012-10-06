@@ -1,6 +1,7 @@
 package com.hackdiary.geo;
 
 import com.google.common.cache.*;
+import com.google.common.base.*;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
@@ -10,13 +11,15 @@ class LatLng {
     this.lat = lat;
     this.lng = lng;
   }
-  public double lat;
-  public double lng;
+  public final double lat;
+  public final double lng;
   public int hashCode() {
-    int hash = new Double(lat).hashCode() + 3 * new Double(lng).hashCode();
-    return hash;
+    return Objects.hashCode(lat, lng);
   }
   public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
     if (obj instanceof LatLng) {
       LatLng o = (LatLng)obj;
       return (Double.compare(this.lat, o.lat) == 0 &&
@@ -25,7 +28,7 @@ class LatLng {
     return false;
   }
   public String toString() {
-    return String.format("%f, %f", lat, lng);
+    return String.format("%f,%f", lat, lng);
   }
 }
 
