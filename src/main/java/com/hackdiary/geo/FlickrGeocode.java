@@ -1,4 +1,5 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
+package com.hackdiary.geo;
+
 import com.vividsolutions.jts.*;
 import com.vividsolutions.jts.index.*;
 import com.vividsolutions.jts.index.strtree.*;
@@ -14,31 +15,25 @@ import org.opengis.feature.*;
 import org.geotools.geometry.jts.JTS;
 
 import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.*;
+import java.net.URL;
 
-public class FlickrGeocode extends HttpServlet {
+public class FlickrGeocode {
   public STRtree tree = new STRtree();
-  public FlickrGeocode() throws IOException {
+  GeometryFactory gf = new GeometryFactory();
+  public FlickrGeocode(URL url) throws IOException {
     org.geotools.util.logging.Logging.GEOTOOLS.setLoggerFactory(org.geotools.util.logging.Log4JLoggerFactory.getInstance());
     org.apache.log4j.LogManager.getLogger("org.geotools").setLevel(org.apache.log4j.Level.OFF);
-    ShapefileDataStore data = new ShapefileDataStore(getClass().getResource("flickr_shapes_public_dataset_2.0/flickr_shapes_localities/OGRGeoJSON.shp"));
+    ShapefileDataStore data = new ShapefileDataStore(url);
     int count = 0;
     for(FeatureReader<SimpleFeatureType, SimpleFeature> reader = data.getFeatureReader() ; reader.hasNext(); count++) {
       SimpleFeature f = reader.next();
       tree.insert(JTS.toGeometry(f.getBounds()).getEnvelopeInternal(),f);
     }
   }
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    double lat = Double.parseDouble(req.getParameter("lat"));
-    double lng = Double.parseDouble(req.getParameter("lng"));
-    GeometryFactory gf = new GeometryFactory();
+  public List<Map<String, Object>> geocode(double lat, double lng) {
     Coordinate c = new Coordinate(lng, lat);
     Point p = gf.createPoint(c);
-    List<Map> results = new ArrayList<Map>(5);
+    List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
     for(Object f : tree.query(new Envelope(c))) {
       SimpleFeature feature = (SimpleFeature)f;
       MultiPolygon g = (MultiPolygon)feature.getDefaultGeometry();
@@ -56,17 +51,6 @@ public class FlickrGeocode extends HttpServlet {
         //resp.getWriter().print(e);
       }
     }
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.writerWithDefaultPrettyPrinter().writeValue(resp.getWriter(), results);
-  }
-
-  public static void main(String[] args) throws Exception{
-    Server server = new Server(Integer.valueOf(System.getenv("PORT")));
-    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-    context.setContextPath("/");
-    server.setHandler(context);
-    context.addServlet(new ServletHolder(new FlickrGeocode()),"/*");
-    server.start();
-    server.join();   
+    return results;
   }
 }
