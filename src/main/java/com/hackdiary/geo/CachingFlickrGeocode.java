@@ -1,7 +1,7 @@
 package com.hackdiary.geo;
 
 import com.google.common.cache.*;
-import com.google.common.base.*;
+import com.google.common.base.Objects;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
