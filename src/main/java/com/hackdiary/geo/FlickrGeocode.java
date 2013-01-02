@@ -21,13 +21,18 @@ public class FlickrGeocode {
   public STRtree tree = new STRtree();
   GeometryFactory gf = new GeometryFactory();
   public FlickrGeocode(URL url) throws IOException {
+    this(Collections.singletonList(url));
+  }
+  public FlickrGeocode(List<URL> urls) throws IOException {
     org.geotools.util.logging.Logging.GEOTOOLS.setLoggerFactory(org.geotools.util.logging.Log4JLoggerFactory.getInstance());
     org.apache.log4j.LogManager.getLogger("org.geotools").setLevel(org.apache.log4j.Level.OFF);
-    ShapefileDataStore data = new ShapefileDataStore(url);
-    int count = 0;
-    for(FeatureReader<SimpleFeatureType, SimpleFeature> reader = data.getFeatureReader() ; reader.hasNext(); count++) {
-      SimpleFeature f = reader.next();
-      tree.insert(JTS.toGeometry(f.getBounds()).getEnvelopeInternal(),f);
+    for(URL url : urls) {
+      ShapefileDataStore data = new ShapefileDataStore(url);
+      int count = 0;
+      for(FeatureReader<SimpleFeatureType, SimpleFeature> reader = data.getFeatureReader() ; reader.hasNext(); count++) {
+        SimpleFeature f = reader.next();
+        tree.insert(JTS.toGeometry(f.getBounds()).getEnvelopeInternal(),f);
+      }
     }
   }
   public List<Map<String, Object>> geocode(double lat, double lng) {
@@ -39,12 +44,14 @@ public class FlickrGeocode {
       MultiPolygon g = (MultiPolygon)feature.getDefaultGeometry();
       try {
         if(g.contains(p)) {
-          Map<String, Object> result = new HashMap();
+          Map<String, Object> result = new HashMap<String, Object>();
           for(Property prop : feature.getProperties()) {
             if(!prop.getName().toString().equals("the_geom")) {
               result.put(prop.getName().toString(), prop.getValue());
             }
           }
+          result.put("midpoint_lat", feature.getBounds().getMedian(1));
+          result.put("midpoint_lng", feature.getBounds().getMedian(0));
           results.add(result);
         }
       } catch(TopologyException e) {

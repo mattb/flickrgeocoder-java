@@ -3,6 +3,7 @@ package com.hackdiary.geo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.util.*;
+import java.net.*;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -13,12 +14,20 @@ import org.eclipse.jetty.servlet.*;
 public class FlickrGeocodeServlet extends HttpServlet {
   FlickrGeocode geocode;
   public FlickrGeocodeServlet() throws IOException {
-    geocode = new CachingFlickrGeocode(getClass().getResource("flickr_shapes_public_dataset_2.0/flickr_shapes_countries/OGRGeoJSON.shp"));
+    geocode = new CachingFlickrGeocode(Collections.singletonList(getClass().getResource("zillow/ZillowNeighborhoods-CA.shp")));
+  }
+  public FlickrGeocodeServlet(String[] files) throws IOException {
+    List<URL> urls = new ArrayList<URL>(files.length);
+    for(String file : files) {
+      urls.add(new File(file).toURI().toURL());
+    }
+    geocode = new CachingFlickrGeocode(urls);
   }
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     double lat = Double.parseDouble(req.getParameter("lat"));
     double lng = Double.parseDouble(req.getParameter("lng"));
+    resp.setContentType("application/json");
     ObjectMapper mapper = new ObjectMapper();
     mapper.writerWithDefaultPrettyPrinter().writeValue(resp.getWriter(), geocode.geocode(lat, lng));
   }
@@ -28,7 +37,13 @@ public class FlickrGeocodeServlet extends HttpServlet {
     ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
     context.setContextPath("/");
     server.setHandler(context);
-    context.addServlet(new ServletHolder(new FlickrGeocodeServlet()),"/*");
+    FlickrGeocodeServlet servlet;
+    if(args.length == 0) {
+      servlet = new FlickrGeocodeServlet();
+    } else {
+      servlet = new FlickrGeocodeServlet(args);
+    }
+    context.addServlet(new ServletHolder(servlet),"/*");
     server.start();
     server.join();   
   }

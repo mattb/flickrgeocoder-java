@@ -34,11 +34,11 @@ class LatLng {
 
 public class CachingFlickrGeocode extends FlickrGeocode {
   LoadingCache<LatLng, List<Map<String, Object>>> cache;
-  public CachingFlickrGeocode(URL url) throws IOException {
-    this(url, "maximumSize=10000");
+  public CachingFlickrGeocode(List<URL> urls) throws IOException {
+    this(urls, "maximumSize=10000");
   }
-  public CachingFlickrGeocode(URL url, String cacheSpec) throws IOException {
-    super(url);
+  public CachingFlickrGeocode(List<URL> urls, String cacheSpec) throws IOException {
+    super(urls);
     cache = CacheBuilder.newBuilder()
        .from(cacheSpec)
        .build(
