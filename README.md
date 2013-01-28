@@ -9,6 +9,23 @@ ESRI Shapefiles for the Flickr dataset are included in the repository. They were
 
 A Procfile and basic servlet (hardcoded to use the countries dataset) are included so that the geocoder can be run on Heroku.
 
+Running the servlet
+===================
+
+Build the package with maven:
+
+$ mvn package
+
+And run on port 5000 like this:
+
+$ PORT=5000 java -Xmx384m -cp 'target/classes:target/dependency/*' com.hackdiary.geo.FlickrGeocodeServlet src/main/resources/com/hackdiary/geo/zillow/ZillowNeighborhoods-CA.shp
+
+You can add as many shapefiles as you like to the commandline argument and they will all be loaded.
+
+Use the servlet with URLs such as:
+
+http://localhost:5000/?lat=37.783333&lng=-122.416667
+
 Software License
 ================
 
