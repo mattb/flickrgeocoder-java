@@ -28,6 +28,7 @@ public class FlickrGeocodeServlet extends HttpServlet {
     double lat = Double.parseDouble(req.getParameter("lat"));
     double lng = Double.parseDouble(req.getParameter("lng"));
     resp.setContentType("application/json");
+    resp.setHeader("Access-Control-Allow-Origin", "*");
     ObjectMapper mapper = new ObjectMapper();
     mapper.writerWithDefaultPrettyPrinter().writeValue(resp.getWriter(), geocode.geocode(lat, lng));
   }
