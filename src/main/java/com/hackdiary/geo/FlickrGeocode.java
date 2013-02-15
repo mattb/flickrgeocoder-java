@@ -34,6 +34,7 @@ public class FlickrGeocode {
         tree.insert(JTS.toGeometry(f.getBounds()).getEnvelopeInternal(),f);
       }
     }
+    tree.build();
   }
   public List<Map<String, Object>> geocode(double lat, double lng) {
     Coordinate c = new Coordinate(lng, lat);
