@@ -1,6 +1,7 @@
 package com.hackdiary.geo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import java.io.*;
 import java.util.*;
 import java.net.*;
@@ -30,7 +31,11 @@ public class FlickrGeocodeServlet extends HttpServlet {
     resp.setContentType("application/json");
     resp.setHeader("Access-Control-Allow-Origin", "*");
     ObjectMapper mapper = new ObjectMapper();
-    mapper.writerWithDefaultPrettyPrinter().writeValue(resp.getWriter(), geocode.geocode(lat, lng));
+    Object result = geocode.geocode(lat, lng);
+    if(req.getParameter("callback") != null) {
+      result = new JSONPObject(req.getParameter("callback"), result);
+    }
+    mapper.writerWithDefaultPrettyPrinter().writeValue(resp.getWriter(), result);
   }
 
   public static void main(String[] args) throws Exception{
@@ -46,6 +51,7 @@ public class FlickrGeocodeServlet extends HttpServlet {
     }
     context.addServlet(new ServletHolder(servlet),"/*");
     server.start();
+    System.out.println("Tree loaded. Total memory (MB): " + (Runtime.getRuntime().totalMemory() / 1024 / 1024.0));
     server.join();   
   }
 }
